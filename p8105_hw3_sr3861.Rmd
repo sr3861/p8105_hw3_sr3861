@@ -120,7 +120,20 @@ accel_data = read_csv("./Data/accel_data.csv") %>%
 ```
 
 #### Describe the dataset
+This dataset has `r nrow(accel_data)` rows or observations and `r ncol(accel_data)` columns. The variables include the week number (week), a day id (day_id), the type of (day_type), day of the week (day), the minute of the day (minute), and the activity level recorded at each minute of the day (count).
 
+#### Total activity per day
+
+```{r}
+accel_data %>%
+  mutate(day = forcats::fct_relevel(day, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(week, day) %>%
+  summarize(total_activity = sum(count)) %>%
+  pivot_wider(
+    names_from = day,
+    values_from = total_activity) %>%
+  knitr::kable() 
+```
 
 
 
