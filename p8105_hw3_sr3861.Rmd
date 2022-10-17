@@ -108,7 +108,7 @@ instacart %>%
 
 #### Load and tody the data
 
-```{r}
+```{r load accel}
 accel_data = read_csv("./Data/accel_data.csv") %>%
   janitor::clean_names() %>% 
   pivot_longer(
@@ -124,16 +124,29 @@ This dataset has `r nrow(accel_data)` rows or observations and `r ncol(accel_dat
 
 #### Total activity per day
 
-```{r}
+```{r table by day}
+accel_data %>%
+  mutate(day = forcats::fct_relevel(day, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(day) %>%
+  summarize(total_activity_count = sum(count, na.rm = TRUE)) %>%
+  knitr::kable(caption = "*Table 1: Total Activity Count Per Day*")
+```
+
+*TRENDS:*
+It seems like activity levels are highest during the middle/end of the week (Wednesday-Friday) with the lowest activity on Saturdays. 
+
+We can check if this trend is consistent across all weeks:
+
+```{r total per day per week}
 accel_data %>%
   mutate(day = forcats::fct_relevel(day, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
   group_by(week, day) %>%
-  summarize(total_activity = sum(count)) %>%
-  pivot_wider(
-    names_from = day,
-    values_from = total_activity) %>%
-  knitr::kable() 
+  summarize(total_activity_count = sum(count, na.rm = TRUE)) %>%
+  pivot_wider(names_from = day,values_from = total_activity_count
+    ) %>%
+  knitr::kable(caption = "*Table 2: Total Activity Count Per Day Per Week*")
 ```
 
+*Comment:* It looks like the trend is NOT consistent across all weeks. For example, in Week 2, activity levels were highest on Saturday, while in Weeks 4 &5, activity levels were actually lowest on Saturday. There is quite a bit of variation across both weeks and days.  
 
 
