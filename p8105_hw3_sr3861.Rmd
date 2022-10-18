@@ -149,4 +149,19 @@ accel_data %>%
 
 *Comment:* It looks like the trend is NOT consistent across all weeks. For example, in Week 2, activity levels were highest on Saturday, while in Weeks 4 &5, activity levels were actually lowest on Saturday. There is quite a bit of variation across both weeks and days.  
 
+#### 24-hour Activity
+```{r 24 hour plot}
+accel_data %>%
+  mutate(minute = as.integer(minute))%>%
+  group_by(day, minute) %>%
+  ggplot(aes(x = minute, y = count, color = day, group = day_id)) + geom_point() + 
+  labs(
+    title = "24-hour Activity Per Day",
+    x = "Hour(0-24)",
+    y = "Activity") + 
+  scale_x_continuous(
+    breaks = c(0, 120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440),
+    labels = c("0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24"))
+```
+
 
