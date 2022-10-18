@@ -175,22 +175,19 @@ data("ny_noaa")
 ```
 
 **Description:**
-This dataset has `r nrow(ny_noaa)` observations for `r ncol(ny_noaa)` variables. The data includes variables to describe the min and max temperatures, precipitation, and snow on different dates. In the whole dataset, there are `r sum(is.na(ny_noaa))` missing values. 
+This dataset has `r nrow(ny_noaa)` observations for `r ncol(ny_noaa)` variables. The data includes variables to describe the min and max temperatures, precipitation, and amount of snow on different dates. In the whole dataset, there are `r sum(is.na(ny_noaa))` missing values. 
 
 #### Clean & Tidy Data
 ```{r clean & tidy ny_noaa}
 tidy_noaa <-
   ny_noaa %>% janitor::clean_names() %>% 
-  separate(date, into = c("year","month","day"),sep="-") %>% 
+  separate(date, into = c("year", "month", "day"),sep="-") %>% 
   mutate(
     month = as.numeric(month),
     day = as.numeric(day),
     year = as.numeric(year),
     tmax= as.numeric(tmax),
-    tmin= as.numeric(tmin),
-    month = as.character(month),
-    year = as.character(year)
-  ) %>% 
+    tmin= as.numeric(tmin)) %>% 
   mutate(tmax = tmax/10, #convert to degrees C
          tmin = tmin/10,
          prcp = prcp/10)#convert to mm
@@ -200,7 +197,7 @@ The most commonly observed value for snowfall is 0. This is because it does not 
 #### 2-Panel graph of January & July Tmax
 ```{r plot tmax}
 tidy_noaa %>% 
-  filter(month == 1) | month == 7 %>% 
+  filter(month == "1") | month == "7" %>% 
   group_by(id, year, month) %>% 
   summarise(
     mean_tmax = mean(tmax, na.rm = TRUE)
@@ -211,7 +208,7 @@ tidy_noaa %>%
   labs(
     x = "Year",
     y = "Average Maximum Temperature)",
-    title = "Average Maximum Temperature in January/July at Each Weather Station by Year" ) +
+    title = "Average Maximum Temperature in January/July at Each Weather Station by Year") +
   scale_x_continuous(n.breaks = 10) +
   facet_grid(. ~ month) +
   theme_minimal() +
@@ -223,4 +220,24 @@ It is clear that the average tmax is consistently greater in July than in Januar
 
 #### 2-Panel Plot of TMax vs. TMin
 
+```{r tmin vs. tmax}
+min_v_max = ny_noaa %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex() +
+  labs(
+    x = "Min Temperature (C)",
+    y = "Max Temperature (C)",
+    fill = "Count",
+    title = "Max vs. Min Temperature for Each Weather Station by Year") +
+  scale_x_continuous(n.breaks = 10) +
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+
 #### 2-Panel plot of Snowfall 
+```{r plot snowfall}
+tidy_noaa %>% 
+  filter( snow <100 & snow >0) %>% 
+  ggplot(aes(x = year)) +
+  geom_histogram()
+```
