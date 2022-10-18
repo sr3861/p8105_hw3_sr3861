@@ -196,7 +196,8 @@ The most commonly observed value for snowfall is 0. This is because it does not 
 
 #### 2-Panel graph of January & July Tmax
 ```{r plot tmax}
-tidy_noaa %>% 
+plot_tmax <-
+  tidy_noaa %>% 
   filter(month == "1") | month == "7" %>% 
   group_by(id, year, month) %>% 
   summarise(
@@ -218,7 +219,7 @@ tidy_noaa %>%
 **COMMENT:**
 It is clear that the average tmax is consistently greater in July than in January. There are some ups and downs in the trend over the years, with some notable lower outliers occurring in the early years. This may have been observation error or a true rare low temperature month. 
 
-#### 2-Panel Plot of TMax vs. TMin
+#### Plot of TMax vs. TMin
 
 ```{r tmin vs. tmax}
 min_v_max = ny_noaa %>% 
@@ -234,10 +235,20 @@ min_v_max = ny_noaa %>%
   theme(legend.position = "right")
 ```
 
-#### 2-Panel plot of Snowfall 
+#### Plot of Snowfall 
 ```{r plot snowfall}
-tidy_noaa %>% 
-  filter( snow <100 & snow >0) %>% 
-  ggplot(aes(x = year)) +
-  geom_histogram()
+plot_snowfall <-
+  tidy_noaa %>%
+  filter(snow >0, snow <100) %>%
+  ggplot(aes(x = snow, y = as.factor(year))) +
+  geom_density_ridges(scale = 0.8) +
+  xlim(0, 100) +
+  labs(title = "Snowfall by Year (0-100 mm)",
+       x = "Snowfall in mm",
+       y = "Year")
+```
+
+#### Combined 2-Panel Plot
+```{r combine plots}
+min_v_max + plot_snowfall
 ```
